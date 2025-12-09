@@ -11,6 +11,7 @@ struct ContentView: View {
     @State var loading = true
     @Environment(GalleryStore.self) var galleryStore
     @State var selectedGallery : Gallery?
+    @Environment(PathStore.self) var pathStore
     var body: some View {
         VStack{
             if loading {
@@ -22,7 +23,7 @@ struct ContentView: View {
                             VStack(alignment: .center){
                                 Text(gallery.name).foregroundStyle(Color.brown).font(Font.largeTitle).bold(true)
                                 Text(gallery.location).bold(true)
-                                Text(gallery.description).foregroundStyle(Color.gray)
+                                Text(gallery.description).foregroundStyle(Color.gray).lineLimit(1)
                             }
                         }
                     } label: {
@@ -30,7 +31,7 @@ struct ContentView: View {
                     }
                     
                     Tab {
-                        GalleryView(selectedGallery: selectedGallery)
+                        GalleryView(selectedGallery: $selectedGallery)
                     } label: {
                         if let selectedGallery = selectedGallery{
                             Text("\(selectedGallery.name)")
@@ -40,7 +41,10 @@ struct ContentView: View {
                     }
                 }
             }
-        }.task {
+        }.onChange(of: selectedGallery) {
+            pathStore.clear()
+        }
+        .task {
             await galleryStore.loadData()
             loading = false
         }

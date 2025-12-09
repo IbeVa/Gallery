@@ -10,4 +10,8 @@ import Foundation
 @Observable
 class PathStore{
     var path = [Route]()
+    
+    func clear(){
+        path = []
+    }
 }
